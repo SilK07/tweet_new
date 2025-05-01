@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TweetData, processForWordCloud, WordCloudItem } from '@/utils/csvUtils';
-import ReactWordcloud from 'react-wordcloud';
+import { TagCloud } from 'react-tagcloud';
 
 interface WordCloudVisualizationProps {
   data: TweetData[];
@@ -19,31 +18,29 @@ const WordCloudVisualization = ({ data }: WordCloudVisualizationProps) => {
     }
   }, [data]);
 
-  // Customize word cloud options
-  const options = {
-    colors: ['#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF'],
-    enableTooltip: true,
-    deterministic: false,
-    fontFamily: 'impact',
-    fontSizes: [12, 60] as [number, number], // Type as MinMaxPair
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    padding: 1,
-    rotations: 3,
-    rotationAngles: [0, 90] as [number, number],
-    scale: 'linear' as const, // Explicitly type as a valid scale value
-    spiral: 'archimedean' as const, // Explicitly type as a valid spiral value
-    transitionDuration: 1000,
-  };
+  // Convert words to the format expected by react-tagcloud
+  const tagCloudData = words.map(word => ({
+    value: word.text,
+    count: word.value,
+  }));
 
   return (
     <Card className="w-full h-full min-h-[400px]">
       <CardHeader>
         <CardTitle>Most Frequent Words</CardTitle>
       </CardHeader>
-      <CardContent className="h-[350px]">
+      <CardContent className="h-[350px] flex items-center justify-center">
         {words.length > 0 ? (
-          <ReactWordcloud words={words} options={options} />
+          <TagCloud
+            minSize={12}
+            maxSize={35}
+            tags={tagCloudData}
+            className="w-full h-full"
+            colorOptions={{
+              luminosity: 'dark',
+              hue: 'blue'
+            }}
+          />
         ) : (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">No data available</p>
